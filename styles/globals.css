@@ -1,0 +1,108 @@
+html {
+  width: 100%;
+}
+
+body {
+  width: 100%;
+
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    color: white;
+    background: black;
+  }
+}
+
+table {
+  border: 1px solid black;
+  border-collapse: collapse;
+
+}
+
+tbody {
+  margin: 0;
+  border: 1px solid black;
+}
+
+table th {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid black;
+  outline: none;
+  flex-grow: 1;
+  width: auto;
+  padding: 5px;
+}
+
+table td {
+  margin: 0;
+  background-color: #ffff;
+  font-weight: bold;
+  border: 1px solid black;
+  font-size: 14px;
+  outline: none;
+  white-space: 0;
+  text-align: right;
+  flex-grow: 1;
+  width: auto;
+}
+
+
+popup-button {
+  padding: 20px;
+  width: 80px;
+}
+
+total {
+  background-color: aqua;
+}
+
+input {
+  font-size: 12px;
+  font-weight: bold;
+  outline: none;
+  transition: 0.5s;
+  border: 1px solid #eaeaea;
+  -webkit-transition: 0.5s;
+}
+
+
+input[type=text]:focus {
+  border: 1px solid #1e90ff;
+
+
+}
+
+a {
+  text-decoration: none;
+}
+
+.login-page {
+  width: 100%;
+  height: 100vh;
+  display: inline-block;
+  display: flex;
+  align-items: center;
+}
+
+.form-right i {
+  font-size: 100px;
+}
+
+
+@import "updated_collapsible"
