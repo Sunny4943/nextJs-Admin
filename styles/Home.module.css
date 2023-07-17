@@ -251,7 +251,7 @@ th:hover .resize_handle {
 .navigation {
   width: auto;
   height: 70px;
-  background-color: #a4a4a4;
+  background-color: #1e90ff;
   position: relative;
   display: flex;
   justify-content: center;

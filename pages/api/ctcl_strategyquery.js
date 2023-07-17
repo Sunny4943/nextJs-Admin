@@ -2,8 +2,8 @@ var sql = require("mssql");
 var dbConfig = {
     user: "sa",
     password: "",
-    // server: "192.168.1.121",//192.168.1.31
-    server: "192.168.1.31",
+    server: "192.168.1.121",//192.168.1.31
+    //server: "192.168.1.31",
     port: 1433,
     // database: "CTCL_MCX",
     database: "ClientdbMCX",

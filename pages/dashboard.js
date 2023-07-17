@@ -9,21 +9,24 @@ import { FaCcAmazonPay } from "react-icons/fa"
 import { toast, Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Switch } from 'evergreen-ui';
-import { Table } from 'evergreen-ui'
+//import { Table } from 'evergreen-ui'
 import { Checkbox } from 'evergreen-ui'
 import { MDBFooter, MDBNavbar } from '../node_modules/mdb-react-ui-kit';
-import { Modal, Toggle, Button, ButtonToolbar, Placeholder } from 'rsuite';
+import { Modal, Toggle, Button, ButtonToolbar, Placeholder, Pagination } from 'rsuite';
 import "rsuite/dist/rsuite.css";
+import { Table } from "rsuite";
 //import * as fun1 from './module/supportFunction'
 //import { fetchCompletedList, fetchPendingList, wait } from '../src/admin/supportFunction'
 import { DatePicker, InputPicker } from 'rsuite';
+const { Column, HeaderCell, Cell } = Table;
 class Dashboard1 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       complatedModalVisible: false, pendingModalVisible: false, showDepthModalVisible: false,
       showToggle: false, autoSyncToggle: false,
-      completedList: [], pendingList: [],
+      pendingList: [], pendinListLimit: 5, pendingListPage: 1
+      , completedList: [], completedListLimit: 5, completedListPage: 1,
       width: 0, height: 0, completedModalArray: [],
       pendingModalArray: [], fromDate: new Date(), toDate: new Date(), clientList: [{ label: 'ALL', value: 'ALL' }],
       clientName: ""
@@ -46,8 +49,6 @@ class Dashboard1 extends React.Component {
       });
     }
     console.log(evt.target.name + " " + evt.target.value)
-
-
   }
   handleCheckBox = (evt) => {
     const checked = evt.target.checked;
@@ -62,7 +63,6 @@ class Dashboard1 extends React.Component {
       });
     }
     console.log(evt.target.name + " " + evt.target.checked)
-
   }
 
   fetchCompletedList = async (fromDate, toDate, Client) => {
@@ -76,7 +76,6 @@ class Dashboard1 extends React.Component {
     }
     else {
       console.log("Not Found....");
-
     }
     completedList = await fetch('/api/ctcl_strategyquery', {
       // completedList = await fetch('https://335b-103-221-76-177.ngrok-free.app/api/ctcl_strategyquery', {
@@ -193,7 +192,11 @@ class Dashboard1 extends React.Component {
 
   }
   render() {
-
+    const completedData = this.state.completedList.filter((v, i) => {
+      const start = this.state.completedListLimit * (this.state.completedListPage - 1);
+      const end = start + this.state.completedListLimit;
+      return i >= start && i < end;
+    });
     return (
       <div style={{ width: "100%", margin: "0px" }}>
         <ToastContainer />
@@ -288,8 +291,62 @@ class Dashboard1 extends React.Component {
               <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: 'auto', }}>
                 <div style={{ padding: '10px', paddingTop: '2px' }}><span style={{ color: '#333', fontWeight: 'bold' }}>Currently Running</span></div>
                 <div style={{ padding: '10px', paddingTop: '1px', width: '100%' }}>
+                  <div>
+                    <Table height={180} data={completedData} onRowClick={(rowData, dataKey) => {
+                      console.log(rowData);
 
-                  <Table>
+                    }}>
+                      <Column width="auto" flexGrow={2} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Client Id</HeaderCell>
+                        <Cell dataKey="ClientID" />
+                      </Column>
+
+                      <Column width="auto" flexGrow={2} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Strategy Name</HeaderCell>
+                        <Cell dataKey="StrategyCode" />
+                      </Column>
+
+                      <Column width="auto" flexGrow={1} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>QTY</HeaderCell>
+                        <Cell dataKey="Quantity" />
+                      </Column>
+
+                      <Column width="auto" flexGrow={1} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Profit/LOSS</HeaderCell>
+                        <Cell>
+                          {rowData =>
+                            <span style={{ color: parseInt(rowData.Net) > 0 ? "green" : "red" }}>{rowData.Net}</span>
+                          }
+                        </Cell>
+                      </Column>
+                      <Column width="auto" flexGrow={2} resizable >
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff", alignContent: 'start', wordWrap: "break-word" }}><span style={{ width: "100%", padding: '5px', paddingLeft: "4px", paddingRight: "4px", marginLeft: "5px", marginRight: "5px", backgroundColor: 'orange', color: '#FFFFFF', fontWeight: 'bold', border: '0px', cursor: 'pointer', borderRadius: "30px", padding: '7px' }}>Modify</span></HeaderCell>
+                        <Cell style={{ padding: '6px' }}>
+
+                        </Cell>
+                      </Column>
+                    </Table>
+                    <div style={{ padding: 20 }}>
+                      <Pagination
+                        prev
+                        next
+                        first
+                        last
+                        ellipsis
+                        boundaryLinks
+                        maxButtons={5}
+                        size="xs"
+                        layout={['total', '-', 'limit', '|', 'pager', 'skip']}
+                        total={this.state.pendingList.length}
+                        limitOptions={[5, 10, 30, 50]}
+                        limit={this.state.pendinListLimit}
+                        activePage={this.state.pendingListPage}
+                        onChangePage={(value) => { this.setState({ pendingListPage: value }) }}
+                        onChangeLimit={(value) => { this.setState({ pendinListLimit: value, pendingListPage: 1 }) }}
+                      />
+                    </div>
+                  </div>
+                  {/*<Table>
                     <Table.Head style={{ width: 'auto' }} overflowX="scroll" whiteSpace="normal"  >
                       <Table.TextHeaderCell fontWeight='bold'>Client Id</Table.TextHeaderCell>
                       <Table.TextHeaderCell fontWeight='bold'>Strategy Name</Table.TextHeaderCell>
@@ -312,7 +369,7 @@ class Dashboard1 extends React.Component {
                           </Table.Row>
                         ))}
                     </Table.Body>
-                  </Table>
+                        </Table>*/}
 
                 </div>
               </div>
@@ -323,7 +380,55 @@ class Dashboard1 extends React.Component {
               <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: 'auto', }}>
                 <div style={{ padding: '10px', paddingTop: '2px' }}><span style={{ color: '#333', fontWeight: 'bold' }}>Completed</span></div>
                 <div style={{ padding: '10px', paddingTop: '1px', width: 'auto' }}>
-                  <Table width='auto'>
+                  <div>
+                    <Table height={180} data={completedData} onRowClick={(rowData) => { this.openModal("COMPLETED", rowData.StrategyCode) }}>
+                      <Column width="auto" flexGrow={1} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Client Id</HeaderCell>
+                        <Cell dataKey="ClientID" />
+                      </Column>
+
+                      <Column width="auto" flexGrow={2} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Strategy Name</HeaderCell>
+                        <Cell dataKey="StrategyCode" />
+                      </Column>
+
+                      <Column width="auto" flexGrow={1} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>QTY</HeaderCell>
+                        <Cell dataKey="Quantity" />
+                      </Column>
+
+                      <Column width="auto" flexGrow={1} resizable>
+                        <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Profit/LOSS</HeaderCell>
+                        <Cell>
+                          {rowData =>
+                            <span style={{ color: parseInt(rowData.Net) > 0 ? "green" : "red" }}>{rowData.Net}</span>
+                          }
+                        </Cell>
+                      </Column>
+
+                    </Table>
+                    <div style={{ padding: 20 }}>
+                      <Pagination
+                        prev
+                        next
+                        first
+                        last
+                        ellipsis
+                        boundaryLinks
+                        maxButtons={5}
+                        size="xs"
+                        layout={['total', '-', 'limit', '|', 'pager', 'skip']}
+                        total={this.state.completedList.length}
+                        limitOptions={[5, 10, 30, 50]}
+                        limit={this.state.completedListLimit}
+                        activePage={this.state.completedListPage}
+                        onChangePage={(value) => { this.setState({ completedListPage: value }) }}
+                        onChangeLimit={(value) => { this.setState({ completedListLimit: value, completedListPage: 1 }) }}
+                      />
+                    </div>
+                  </div>
+
+                  {/*<Table width='auto'>
                     <Table.Head>
                       <Table.TextHeaderCell>Client Id</Table.TextHeaderCell>
                       <Table.TextHeaderCell>Strategy Name</Table.TextHeaderCell>
@@ -347,7 +452,7 @@ class Dashboard1 extends React.Component {
                       }
                     </Table.Body>
 
-                  </Table>
+                    </Table>*/}
                   <Modal overflow={false} size="lg" height="90%" open={this.state.complatedModalVisible} onClose={() => { this.closeModal("COMPLETED") }}>
                     <Modal.Header style={{ padding: '0px', margin: "0px", width: '100%' }}>
                       <Modal.Title>
@@ -356,38 +461,75 @@ class Dashboard1 extends React.Component {
                       <hr style={{ background: '#ACACAC', color: '#ACACAC', borderColor: '#ACACAC', height: '1px', padding: '0px', margin: "3px", witdh: '100%' }} />
                     </Modal.Header>
                     <Modal.Body style={{ padding: '0px', margin: "0px", width: "100%" }}>
-                      <Table width='auto'>
-                        <Table.Head width='auto' overflowX="scroll" whiteSpace="normal">
-                          <Table.TextHeaderCell>Instrument</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Entry Time</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Entry Qty</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Entry Price</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Exit Time</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Exit Qty</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Exit Price</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Trade Type</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>Status</Table.TextHeaderCell>
-                          <Table.TextHeaderCell>P&L</Table.TextHeaderCell>
-                        </Table.Head>
-                        <Table.Body height={'auto'}>
-                          {Array(5)
-                            .fill("")
-                            .map((e, index) => (
-                              <Table.Row key={index} style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#e9e9e9', cursor: 'pointer' }}>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                                <Table.TextCell fontWeight='bold'>{index}</Table.TextCell>
-                              </Table.Row>
-                            ))}
-                        </Table.Body>
-                      </Table>
+                      <div>
+                        <Table width='auto' data={[]} >
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Instrument</HeaderCell>
+                            <Cell dataKey="ClientID" />
+                          </Column>
+
+                          <Column width="auto" flexGrow={2} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Entry Time</HeaderCell>
+                            <Cell dataKey="StrategyCode" />
+                          </Column>
+
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Entry Qty</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Entry Price</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Exit Time</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Exit Qty</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Exit Price</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Trade Type</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>Status</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+                          <Column width="auto" flexGrow={1} resizable>
+                            <HeaderCell style={{ background: "#1e90ff", color: "#ffffff" }}>P&L</HeaderCell>
+                            <Cell dataKey="Quantity" />
+                          </Column>
+
+
+                        </Table>
+                        <div style={{ padding: 20 }}>
+                          <Pagination
+                            prev
+                            next
+                            first
+                            last
+                            ellipsis
+                            boundaryLinks
+                            maxButtons={5}
+                            size="xs"
+                            layout={['total', '-', 'limit', '|', 'pager', 'skip']}
+                            //total={this.state.completedList.length}
+                            limitOptions={[5, 10, 30, 50]}
+                          //limit={this.state.completedListLimit}
+                          //activePage={this.state.completedListPage}
+                          // onChangePage={(value) => { this.setState({ completedListPage: value }) }}
+                          //onChangeLimit={(value) => { this.setState({ completedListLimit: value, completedListPage: 1 }) }}
+                          />
+                        </div>
+                      </div>
+
                     </Modal.Body>
                     <Modal.Footer style={{ padding: '0px', margin: "0px" }}>
                       <hr style={{ background: '#ACACAC', color: '#ACACAC', borderColor: '#ACACAC', height: '1px', padding: '0px', margin: "3px", witdh: '100%' }} color='red' />
@@ -427,7 +569,7 @@ class Dashboard1 extends React.Component {
                   </a>
                 </li>
                 <li className={"list " + styles.active}>
-                  <a href="#">
+                  <a>
                     <span className={styles.icon}>
                       <MdDashboard />
                     </span>

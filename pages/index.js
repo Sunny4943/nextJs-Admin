@@ -42,7 +42,7 @@ class home extends React.Component {
       alert('Please enter username and password');
     } else {
       store.dispatch(Action.default.login({ login: true, email: userName }));
-      Router.router.push("/dashboard")
+      Router.router.push("/src/home")
     }
   }
 

@@ -3,7 +3,7 @@
   "appName": "nextjs-capacitor",
   "webDir": "out",
   "server": {
-    "url": "https://d63e-103-221-76-177.ngrok-free.app",
+    "url": "https://next-js-admin-sunny4943.vercel.app",
     "cleartext": true
   }
 }

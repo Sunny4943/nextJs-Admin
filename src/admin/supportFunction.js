@@ -530,7 +530,7 @@ export async function fetchCompletedList(fromDate, toDate, Client) {
 
     }
     // completedList = await fetch('/api/ctcl_strategyquery', {
-    completedList = await fetch('https://a761-103-221-76-177.ngrok-free.app/api/ctcl_strategyquery', {
+    completedList = await fetch('/api/ctcl_strategyquery', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
