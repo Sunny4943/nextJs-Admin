@@ -7,12 +7,19 @@ import { MdDashboard, MdLogout, MdOutlineMiscellaneousServices } from "react-ico
 import { FaCcAmazonPay } from "react-icons/fa"
 import { toast, Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import { MDBFooter, MDBNavbar } from '../../node_modules/mdb-react-ui-kit';
-import Dashboard from './homeComponent/dashboard';
-import Strategies from './homeComponent/strategies';
-import Services from './homeComponent/services';
-import BillPay from './homeComponent/billPay';
-import { fetchCompletedList, fetchPendingList, wait } from '../../src/admin/supportFunction'
+import Dashboard from './home/dashboard';
+import Strategies from './home/strategies';
+import Services from './home/services';
+import BillPay from './home/billPay';
+import Subscribe_User from './home/subscribeUser';
+import { store } from '../../src/store'
+import * as Action from '../../src/actions'
+import Router from 'next/router'
+import { Popover, Whisper, Button } from "rsuite";
+import { fetchCompletedList, fetchPendingList, wait, fetchOnCompletedRowClick, fetchClientList, fetchALLCLient } from '../../src/admin/supportFunction'
+
 class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -24,7 +31,12 @@ class Home extends React.Component {
             width: 0, height: 0, completedModalArray: [],
             pendingModalArray: [], fromDate: new Date(), toDate: new Date(), clientList: [{ label: 'ALL', value: 'ALL' }],
             clientName: "", dashBoaedPage: true, strategyPage: false, servicePage: false, billPayPage: false,
+            completedListRowArray: [], completedListRowLimit: 10, completedListRowPage: 1, RealisedPNL: 0, UnRealisedPNL: 0,
+            pendingListRowArray: [], pendingListRowLimit: 10, pendingListRowPage: 1, NetPNL: 0, comletedRowTotalPNL: 0, pendingRowTotalPNL: 0,
+            isLoading: false, SubscribePage: false, clientdetails: []
         }
+        this.fetchClientName();
+        this.fetchAllClientDetails();
         this.onSubmitButtonClick.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.updateNavigationButton = this.updateNavigationButton.bind(this);
@@ -71,7 +83,12 @@ class Home extends React.Component {
 
         }
         else if (val === "PENDING") {
-            this.setState({ pendingModalVisible: true })
+            var tempArray = [];
+            tempArray[0] = { "StrategyName": list }
+            this.setState({
+                pendingModalVisible: true, pendingModalArray: tempArray
+            });
+            //this.setState({ : true })
         }
         else if (val === "ShowDepthModal") {
             this.setState({ showDepthModalVisible: true })
@@ -99,18 +116,21 @@ class Home extends React.Component {
     componentWillUnmount() {
         window.removeEventListener('resize', this.updateWindowDimensions);
     }
-
     updateNavigationButton() {
         const list = document.querySelectorAll('.list');
         function activeLink() {
             list.forEach((item) => {
                 let testClass = item.className;
                 const testArray = testClass.split(" ");
-                if (testArray[1]) {
-                    item.classList.remove(testArray[1]);
-                    this.classList.add(testArray[1]);
-                    // console.log(item.className)
-                }
+                this.classList.add(styles.active);
+                item.classList.remove(styles.active);
+                this.classList.add(styles.active);
+                /* if (testArray[1]) {
+                     // this.classList.add(testArray[1]);
+                     item.classList.remove(testArray[1]);
+                     this.classList.add(testArray[1]);
+                     // console.log(item.className)
+                 }*/
             })
         }
         list.forEach((item) => {
@@ -122,8 +142,71 @@ class Home extends React.Component {
             console.log(this.state.width + " " + this.state.height)
         });
     }
+    onPendingRowClick = async (strategy) => {
+        //console.log(strategy)
+        var tempNetPNL = 0;
+        if (strategy) {
+            const pendingList = await fetchOnCompletedRowClick(strategy).then(function (result) {
+                console.log(JSON.stringify(result))
+                return result ? result : [];
+            }).catch((err) => { console.log(err) });
 
+            if (pendingList) {
+                for (var i = 0; i < pendingList.length; i++) {
+                    tempNetPNL = parseInt(tempNetPNL) + parseInt(pendingList[i]['Net'])
+                }
+                console.log((tempNetPNL))
+            }
+            this.setState({ pendingListRowArray: pendingList, pendingRowTotalPNL: (tempNetPNL.toFixed(2)) }, () => {
+                console.log(this.state.pendingListRowArray)
+            })
+        }
+    }
+    onCompletedRowClick = async (strategy) => {
+
+        var tempNetPNL = 0;
+        if (strategy) {
+            const completedList = await fetchOnCompletedRowClick(strategy).then(function (result) {
+                console.log(JSON.stringify(result))
+                return result ? result : [];
+            }).catch((err) => { console.log(err) });
+
+            if (completedList) {
+                for (var i = 0; i < completedList.length; i++) {
+                    tempNetPNL = parseInt(tempNetPNL) + parseInt(completedList[i]['Net'])
+                }
+                console.log((tempNetPNL))
+            }
+            this.setState({ completedListRowArray: completedList, comletedRowTotalPNL: (tempNetPNL.toFixed(2)) })
+        }
+    }
+    fetchAllClientDetails = async () => {
+        const clntdetails = await fetchALLCLient().then(function (result) {
+            // console.log(JSON.stringify(result))
+            return result ? result : [];
+        }).catch((err) => { console.log(err) });
+        this.setState({ clientdetails: clntdetails })
+
+    }
+    fetchClientName = async () => {
+        const clntList = await fetchClientList().then(function (result) {
+            console.log(JSON.stringify(result))
+            return result ? result : [];
+        }).catch((err) => { console.log(err) });
+        var tempArray = [{ label: 'ALL', value: 'ALL' }];
+        if (clntList) {
+            clntList.map((data) => {
+                tempArray.push({ label: data["ClientName"] + " - " + data['ClientCode'], value: data['ClientCode'] })
+            })
+        }
+        this.setState({
+            clientList: tempArray
+        })
+    }
     onSubmitButtonClick = async () => {
+        this.setState({ isLoading: true })
+        var tempUnRePNL = 0, tempRePNL = 0, tempNetPNL = 0;
+        var tempRElquantity = 0;
         console.log("clicked");
         var strFromDate = "", strToDate = "", strClient = ""
         strFromDate = document.getElementById("FromDate").value;
@@ -139,8 +222,22 @@ class Home extends React.Component {
                         console.log(JSON.stringify(result))
                         return result ? result : [];
                     }).catch((err) => { console.log(err) });
+                    if (completedList) {
+                        for (var i = 0; i < completedList.length; i++) {
+                            tempRePNL = parseFloat(tempRePNL) + ((parseInt(completedList[i]['SellQty']) * parseFloat(completedList[i]['SellPrice']).toFixed(2)) - (parseInt(completedList[i]['SellQty']) * parseFloat(completedList[i]['BuyPrice']).toFixed(2)));
+                            // tempNetPNL = tempNetPNL + parseInt(completedList[i]['Net'])
+                            if ((parseInt(completedList[i]['BuyQty'])) > (parseInt(completedList[i]['SellQty']))) {
+                                tempUnRePNL = parseFloat(tempUnRePNL) + ((parseInt(completedList[i]['Quantity']) * parseFloat(completedList[i]['LTP']).toFixed(2)) - (parseInt(completedList[i]['Quantity']) * parseFloat(completedList[i]['BuyPrice']).toFixed(2)));
+                            }
+                            else {
+                                tempUnRePNL = parseFloat(tempUnRePNL) + ((parseInt(completedList[i]['Quantity']) * parseFloat(completedList[i]['SellPrice']).toFixed(2)) - (parseInt(completedList[i]['Quantity']) * parseFloat(completedList[i]['LTP']).toFixed(2)));
+                            }
 
-                    this.setState({ completedList: completedList }, () => { console.log(this.state.completedList) })
+                        }
+                        // console.log(JSON.stringify(completedList))
+                    }
+
+                    this.setState({ completedList: completedList, RealisedPNL: (tempRePNL.toFixed(2)), UnRealisedPNL: (tempUnRePNL.toFixed(2)) }, () => { console.log(this.state.completedList) })
                 }
                 else {
                     toast.warn("Select Client....")
@@ -154,14 +251,33 @@ class Home extends React.Component {
             toast.warn("Select Valid Date....")
         }
 
+        this.setState({ isLoading: false })
+    }
+    logout = async () => {
+        //store.dispatch(Action.default.login({ login: false, userName: "", subscriptionExpiry: "" }));
+        const auth_api = await fetch('/api/auth/logout', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            //body: JSON.stringify({ query: tempQuery, type: "select" }),
+        })
+            .then((result) => result.json()) // here
+            .then((result) => { return result })
+        if (auth_api) {
+            store.dispatch(Action.default.login({ login: false, userName: "", subscriptionExpiry: "", userCode: "" }));
+            Router.router.push("/")
+            localStorage.setItem('token', JSON.stringify(""))
+        }
 
     }
     render() {
-        const completedData = this.state.completedList.filter((v, i) => {
+
+        /*const completedData = this.state.completedList.filter((v, i) => {
             const start = this.state.completedListLimit * (this.state.completedListPage - 1);
             const end = start + this.state.completedListLimit;
             return i >= start && i < end;
-        });
+        });*/
         return (
             <div style={{ width: "100%", margin: "0px" }}>
                 <ToastContainer />
@@ -177,13 +293,29 @@ class Home extends React.Component {
                 {this.state.width > 768 ? <MDBNavbar fixed='top' style={{ width: '100%', boxShadow: "rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px" }} >
                     <div style={{ width: '100%', }}>
                         <div style={{ width: 'auto', display: 'flex', justifyContent: 'space-between' }}>
-                            <div><span style={{ fontSize: 20, fontWeight: 'bold', padding: "10px" }}>Profile</span></div>
+                            <div style={{ cursor: 'pointer' }}>
+                                <Whisper
+                                    //followCursor
+                                    trigger="click"
+                                    placement="bottomStart"
+                                    speaker={
+                                        <Popover arrow={false} ><div style={{ flexDirection: 'column', display: 'flex', justifyContent: 'space-between' }}>
+                                            <div onClick={() => { this.setState({ SubscribePage: true, servicePage: false, dashBoaedPage: false, billPayPage: false, strategyPage: false, }, () => { console.log(this.state.SubscribePage) }) }}><span style={{ color: "#333", fontWeight: 'bold', fontSize: 20, padding: '10px', cursor: 'pointer' }} onClick={() => { this.setState({ SubscribePage: true }) }}>Subscribe User</span></div>
+                                            <div onClick={() => { this.logout() }}><span style={{ color: "#333", fontWeight: 'bold', fontSize: 20, padding: '10px', cursor: 'pointer' }}>Logout</span></div>
+                                        </div></Popover>
+                                    }
+                                >
+                                    <span style={{ fontSize: 20, fontWeight: 'bold', padding: "10px" }}>Hello Admin</span>
+                                </Whisper>
+
+                            </div>
+
                             <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '30px' }}>
                                 <div><span style={{ fontSize: 20, fontWeight: 'bold', padding: "10px", paddingLeft: '30px' }}>Dashboard</span></div>
                                 <div><span style={{ fontSize: 20, padding: "10px", paddingLeft: '30px' }}>Services</span></div>
                                 <div><span style={{ fontSize: 20, padding: "10px", paddingLeft: '30px' }}>Strategies</span></div>
                                 <div><span style={{ fontSize: 20, padding: "10px", paddingLeft: '30px' }}>Bill Pay</span></div>
-                                <div> <button className='button button4' style={{ padding: '20px', paddingLeft: "20px", paddingRight: "20px", marginLeft: "20px", marginRight: "20px", backgroundColor: 'orange', color: '#FFFFFF', fontWeight: 'bold', border: '0px', cursor: 'pointer', borderRadius: "30px", padding: '7px' }}><span> Logout</span></button></div>
+                                <div> <button className='button button4' style={{ padding: '20px', paddingLeft: "20px", paddingRight: "20px", marginLeft: "20px", marginRight: "20px", backgroundColor: 'orange', color: '#FFFFFF', fontWeight: 'bold', border: '0px', cursor: 'pointer', borderRadius: "30px", padding: '7px' }} onClick={() => { this.logout() }}><span> Logout</span></button></div>
                             </div>
                         </div>
                     </div>
@@ -192,27 +324,17 @@ class Home extends React.Component {
                 <main className={styles.main1} style={{ paddingTop: this.state.width > 768 ? '60px' : '10px', paddingBottom: this.state.width > 768 ? '10px' : '100px' }}>
                     {this.state.dashBoaedPage ?
                         <Dashboard
-                            fromDate={this.state.fromDate}
-                            todate={this.state.toDate}
-                            clientName={this.state.clientName}
-                            showToggle={this.state.showToggle}
-                            autoSyncToggle={this.state.autoSyncToggle}
-                            completedList={this.state.completedList}
-                            completedListLimit={this.state.completedListLimit}
-                            completedListPage={this.state.completedListPage}
-                            pendingList={this.state.pendingList}
-                            pendingListPage={this.state.pendingListPage}
-                            pendinListLimit={this.state.pendinListLimit}
                             homeCallback={this.handleCallback}
-                            clientList={this.state.clientList}
                             openModal={this.openModal}
-                            complatedModalVisible={this.state.complatedModalVisible}
-                            completedModalArray={this.state.completedModalArray}
+                            state={this.state}
                             submitCallBack={this.onSubmitButtonClick}
+                            completedRowClick={this.onCompletedRowClick}
+                            pendingRowClick={this.onPendingRowClick}
                         /> : <></>}
                     {this.state.servicePage ? <Services /> : <></>}
                     {this.state.billPayPage ? <BillPay /> : <></>}
                     {this.state.strategyPage ? <Strategies /> : <></>}
+                    {this.state.SubscribePage ? <Subscribe_User state={this.state} /> : <></>}
 
                 </main>
                 {/*End of  Main Div for align content in column*/}
@@ -221,7 +343,7 @@ class Home extends React.Component {
                         <div className={styles.navigation} style={{ borderRadius: "20px" }}>
                             <ui onClick={() => { this.updateNavigationButton(); }}>
                                 <li className={"list"}>
-                                    <a onClick={() => { this.setState({ servicePage: false, dashBoaedPage: false, billPayPage: false, strategyPage: true }) }}>
+                                    <a onClick={() => { this.setState({ servicePage: false, dashBoaedPage: false, billPayPage: false, strategyPage: true, SubscribePage: false }) }}>
                                         <span className={styles.icon}>
                                             <PiStrategyBold />
                                         </span>
@@ -229,7 +351,7 @@ class Home extends React.Component {
                                     </a>
                                 </li>
                                 <li className={"list"}>
-                                    <a onClick={() => { this.setState({ servicePage: true, dashBoaedPage: false, billPayPage: false, strategyPage: false }) }} >
+                                    <a onClick={() => { this.setState({ servicePage: true, dashBoaedPage: false, billPayPage: false, strategyPage: false, SubscribePage: false }) }} >
                                         <span className={styles.icon}>
                                             <MdOutlineMiscellaneousServices />
                                         </span>
@@ -237,7 +359,7 @@ class Home extends React.Component {
                                     </a>
                                 </li>
                                 <li className={"list " + styles.active}>
-                                    <a onClick={() => { this.setState({ servicePage: false, dashBoaedPage: true, billPayPage: false, strategyPage: false }) }}>
+                                    <a onClick={() => { this.setState({ servicePage: false, dashBoaedPage: true, billPayPage: false, strategyPage: false, SubscribePage: false }) }}>
                                         <span className={styles.icon}>
                                             <MdDashboard />
                                         </span>
@@ -245,7 +367,7 @@ class Home extends React.Component {
                                     </a>
                                 </li>
                                 <li className={"list"}>
-                                    <a onClick={() => { this.setState({ servicePage: false, dashBoaedPage: false, billPayPage: true, strategyPage: false }) }}>
+                                    <a onClick={() => { this.setState({ servicePage: false, dashBoaedPage: false, billPayPage: true, strategyPage: false, SubscribePage: false }) }}>
                                         <span className={styles.icon}>
                                             <FaCcAmazonPay />
                                         </span>
@@ -266,7 +388,7 @@ class Home extends React.Component {
 
                     </MDBFooter> : <></>
                 }
-            </div>
+            </div >
 
         )
     }

@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+/*const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
@@ -7,4 +7,23 @@ const nextConfig = {
   }
 };
 
-module.exports = nextConfig;
+module.exports = nextConfig;*/
+const withTM = require('next-transpile-modules')([
+  '@ionic/react',
+  '@ionic/core',
+  '@stencil/core',
+  'ionicons'
+]);
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    images: {
+      unoptimized: true
+    }
+  }
+};
+
+module.exports = withTM(nextConfig);

@@ -1,8 +1,9 @@
 import auth from "./auth";
-import counter from "./counter";
+import zerodhaCredential from "./zerodhaCredential";
 import { combineReducers } from "redux";
 const rootReducer = combineReducers({
-    auth
+    auth,
+    zerodhaCredential
     //, counter
 });
 export default rootReducer;

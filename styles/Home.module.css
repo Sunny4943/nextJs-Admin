@@ -87,7 +87,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, auto));
   grid-gap: 5px;
-  overflow-y: scroll;
+  text-align: left;
+}
+
+.legGrid1 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 1px;
   text-align: left;
 }
 
@@ -167,6 +173,14 @@
   overflow-y: scroll;
   text-align: justify;
 }
+
+.header div span:hover,
+.header_profile:hover {
+  color: #0070f3;
+  font-weight: bold;
+}
+
+
 
 .scrollableY {
   background-color: #f1f1f1;
@@ -368,6 +382,36 @@ th:hover .resize_handle {
 
 .navigation ui li:nth-child(5).active~.indicator {
   transform: translateX(calc(70px*4));
+}
+
+.rs_table_row_pending:nth-child(odd) div {
+  background-color: azure;
+}
+
+.rs_table_row_pending:nth-child(even) div {
+  background-color: #ffffff;
+}
+
+.rs-checkbox-wrapper input {
+  color: #222;
+}
+
+.rs_table_row_completed:nth-child(odd) div {
+  background-color: azure;
+}
+
+.rs_table_row_completed:nth-child(even) div {
+  background-color: #ffffff
+}
+
+
+.rs_table_row_completed_click:nth-child(odd) div {
+  background-color: azure;
+}
+
+
+.rs_table_row_completed_click:nth-child(even) div {
+  background-color: #ffffff
 }
 
 @media (max-width: 600px) {

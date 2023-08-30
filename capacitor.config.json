@@ -1,9 +1,9 @@
 {
   "appId": "com.example.app",
-  "appName": "nextjs-capacitor",
+  "appName": "Access-Token-Generator",
   "webDir": "out",
   "server": {
-    "url": "https://next-js-admin-sunny4943.vercel.app",
+    "url": "https://c995-103-221-76-177.ngrok-free.app",
     "cleartext": true
   }
 }

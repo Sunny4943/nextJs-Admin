@@ -17,7 +17,7 @@ export function loadState() {
 export function saveState(state) {
     try {
         let serializedState = JSON.stringify(state);
-        localStorage.setItem("Test", serializedState);
+        localStorage.setItem("ReduxStore", serializedState);
     }
     catch (err) {
     }

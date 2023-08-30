@@ -16,7 +16,7 @@
 };
 
 export default auth;*/
-const initialState = { login: false, email: '' }
+const initialState = { login: false, userName: '', subscriptionExpiry: "" }
 export default function authReducer(state = initialState, action) {
     // Check to see if the reducer cares about this action 
     switch (action.type) {
@@ -24,7 +24,9 @@ export default function authReducer(state = initialState, action) {
             return {
                 ...state,
                 login: action.payload.login,
-                email: action.payload.email
+                userName: action.payload.userName,
+                userCode: action.payload.userCode,
+                subscriptionExpiry: action.payload.subscriptionExpiry
             };
         default:
             return state;

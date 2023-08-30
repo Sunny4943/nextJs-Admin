@@ -9,8 +9,8 @@ import { FaCcAmazonPay } from "react-icons/fa"
 import { toast, Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Switch } from 'evergreen-ui';
-//import { Table } from 'evergreen-ui'
-import { Checkbox } from 'evergreen-ui'
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+//import { MDBFooter, MDBNavbar } from 'mdb-react-ui-kit/dist/mdb-react-ui-kit.cjs';
 import { MDBFooter, MDBNavbar } from '../node_modules/mdb-react-ui-kit';
 import { Modal, Toggle, Button, ButtonToolbar, Placeholder, Pagination } from 'rsuite';
 import "rsuite/dist/rsuite.css";

@@ -4,11 +4,11 @@ var dbConfig = {
     password: "",
     // server: "192.168.1.31",//192.168.1.31
     // server: "192.168.1.121",
-    server: "192.168.1.31",
+    server: "192.168.1.164",
     port: 1433,
     // database: "clientDBNSE1",
     //database: "CLIENTDBNSECM",
-    databaes: "clientDBNSE_Self",
+    databaes: "CTCL_API",
     options: {
         "encrypt": false
     }
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         var dbConn = await sql.connect(dbConfig);
         if (dbConn) {
             sql.query(req.body['query']).then(function (resp) {
-
+                // console.log(resp.recordset[0])
                 return res.status(200).json({ data: resp.recordset, })
 
                 //  res.status(200).json({ data: resp, })
@@ -44,7 +44,8 @@ export default async function handler(req, res) {
                 return res.status(200).json({ data: err, })
 
             }).finally(function () {
-                dbConn.close();
+                if (dbConn) dbConn.close();
+                // resolve();
             });
         }
     }
@@ -63,7 +64,6 @@ export default async function handler(req, res) {
                         return res.status(200).json({ data: "No record found...." })
                     }
                 }
-
                 //console.log(resp);
                 dbConn.close();
                 //dbConn.close();
@@ -72,7 +72,8 @@ export default async function handler(req, res) {
                 return res.status(200).json({ data: err, })
 
             }).finally(function () {
-                dbConn.close();
+                if (dbConn) dbConn.close();
+                // resolve();
             });
         }
         // res.status(200).json({ data: req.body['query'] })
@@ -100,7 +101,8 @@ export default async function handler(req, res) {
                 dbConn.close();
                 return res.status(200).json({ data: err, })
             }).finally(function () {
-                dbConn.close();
+                if (dbConn) dbConn.close();
+                // resolve();
             });
         }
         // res.status(200
@@ -130,7 +132,8 @@ export default async function handler(req, res) {
                 return res.status(200).json({ data: err, })
 
             }).finally(function () {
-                dbConn.close();
+                if (dbConn) dbConn.close();
+                // resolve();
             });
         }
         // res.status(200
