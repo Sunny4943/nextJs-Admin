@@ -11,7 +11,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Switch } from 'evergreen-ui';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 //import { MDBFooter, MDBNavbar } from 'mdb-react-ui-kit/dist/mdb-react-ui-kit.cjs';
-import { MDBFooter, MDBNavbar } from '../node_modules/mdb-react-ui-kit';
 import { Modal, Toggle, Button, ButtonToolbar, Placeholder, Pagination } from 'rsuite';
 import "rsuite/dist/rsuite.css";
 import { Table } from "rsuite";
@@ -209,21 +208,7 @@ class Dashboard1 extends React.Component {
 
         </Head>
         {/* Main Div for align content in column*/}
-        {this.state.width > 768 ? <MDBNavbar fixed='top' style={{ width: '100%', boxShadow: "rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px" }} >
-          <div style={{ width: '100%', }}>
-            <div style={{ width: 'auto', display: 'flex', justifyContent: 'space-between' }}>
-              <div><span style={{ fontSize: 20, fontWeight: 'bold', padding: "10px" }}>Profile</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '30px' }}>
-                <div><span style={{ fontSize: 20, fontWeight: 'bold', padding: "10px", paddingLeft: '30px' }}>Dashboard</span></div>
-                <div><span style={{ fontSize: 20, padding: "10px", paddingLeft: '30px' }}>Services</span></div>
-                <div><span style={{ fontSize: 20, padding: "10px", paddingLeft: '30px' }}>Strategies</span></div>
-                <div><span style={{ fontSize: 20, padding: "10px", paddingLeft: '30px' }}>Bill Pay</span></div>
-                <div> <button className='button button4' style={{ padding: '20px', paddingLeft: "20px", paddingRight: "20px", marginLeft: "20px", marginRight: "20px", backgroundColor: 'orange', color: '#FFFFFF', fontWeight: 'bold', border: '0px', cursor: 'pointer', borderRadius: "30px", padding: '7px' }}><span> Logout</span></button></div>
-              </div>
-            </div>
-          </div>
-
-        </MDBNavbar> : <></>}
+       
         <main className={styles.main1} style={{ paddingTop: this.state.width > 768 ? '60px' : '10px', paddingBottom: this.state.width > 768 ? '10px' : '100px' }}>
 
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -548,56 +533,7 @@ class Dashboard1 extends React.Component {
           </div>
         </main >
         {/*End of  Main Div for align content in column*/}
-        {
-          this.state.width < 768 ? <MDBFooter className="fixed-bottom" style={{ backgroundColor: '#FFFFFF', paddingLeft: "5px", paddingRight: "5px", paddingBottom: "5px" }}>
-            <div className={styles.navigation} style={{ borderRadius: "20px" }}>
-              <ui onClick={() => { this.updateNavigationButton(); }}>
-                <li className={"list"}>
-                  <a onClick={() => { }}>
-                    <span className={styles.icon}>
-                      <PiStrategyBold />
-                    </span>
-                    <span className={styles.text}>Strategies</span>
-                  </a>
-                </li>
-                <li className={"list"}>
-                  <a >
-                    <span className={styles.icon}>
-                      <MdOutlineMiscellaneousServices />
-                    </span>
-                    <span className={styles.text}>Services</span>
-                  </a>
-                </li>
-                <li className={"list " + styles.active}>
-                  <a>
-                    <span className={styles.icon}>
-                      <MdDashboard />
-                    </span>
-                    <span className={styles.text}>Dashboard</span>
-                  </a>
-                </li>
-                <li className={"list"}>
-                  <a >
-                    <span className={styles.icon}>
-                      <FaCcAmazonPay />
-                    </span>
-                    <span className={styles.text}>Bill Pay</span>
-                  </a>
-                </li>
-                <li className={"list"}>
-                  <a >
-                    <span className={styles.icon}>
-                      <MdLogout />
-                    </span>
-                    <span className={styles.text}>Logout</span>
-                  </a>
-                </li>
-                <div className={styles.indicator}></div>
-              </ui>
-            </div>
-
-          </MDBFooter> : <></>
-        }
+       
       </div >
 
     )
